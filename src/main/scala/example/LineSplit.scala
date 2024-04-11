@@ -19,30 +19,27 @@ object LineSplit {
     val builder: StreamsBuilder = new StreamsBuilder()
     val source: KStream[String, String] = builder.stream("streams-plaintext-input")
 
-    val words: KStream[String, String] = source.flatMapValues(new ValueMapper[String, Iterable[String]]() {
-      override def apply(value: String): Iterable[String] =  {
-        return value.split("\\W+")
+    source.flatMapValues(value => Arrays.asList(value.split("\\W+")))
+      .to("streams-linesplit-output")
+
+      val topology: Topology = builder.build()
+      val streams: KafkaStreams = new KafkaStreams(topology, props)
+
+      val latch: CountDownLatch = new CountDownLatch(1)
+
+      Runtime.getRuntime().addShutdownHook(new Thread("streams-shutdown-hook") {
+        override def run() {
+          streams.close()
+          latch.countDown()
+        }
+      })
+      try {
+        streams.start()
+        latch.await()
+      } catch {
+        case e: Throwable => System.exit(1)
       }
-    })
-    source.to("streams-pipe-output")
-    val topology: Topology = builder.build()
-    val streams: KafkaStreams = new KafkaStreams(topology, props)
 
-    val latch: CountDownLatch = new CountDownLatch(1)
-
-    Runtime.getRuntime().addShutdownHook(new Thread("streams-shutdown-hook") {
-      override def run() {
-        streams.close()
-        latch.countDown()
-      }
-    })
-    try {
-      streams.start()
-      latch.await()
-    } catch {
-      case e: Throwable => System.exit(1)
-    }
-
-    System.exit(0)
+      System.exit(0)
   }
 }
