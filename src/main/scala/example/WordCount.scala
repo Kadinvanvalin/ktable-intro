@@ -17,7 +17,6 @@ object WordCount {
     props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
     val builder: StreamsBuilder = new StreamsBuilder()
     val source = builder.stream[String, String]("streams-plaintext-input")
-    //implicit val materialized = Materialized.`with`[String, Long, ByteArrayWindowStore]as("counts-store")
     val wordCounts = source.flatMapValues(value => {
       val transform = value.toLowerCase(Locale.getDefault()).split("\\W+")
       print("found something!")
@@ -25,7 +24,6 @@ object WordCount {
     })
       .groupBy((_, value) => value)
       .count()
-      //.count(Materialized.[String, Long, KeyValueStore[Bytes, byte[]]]as("counts-store"))
       wordCounts
         .toStream
         .to("streams-wordcount-output")
