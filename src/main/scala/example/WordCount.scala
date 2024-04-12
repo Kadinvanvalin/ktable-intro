@@ -4,11 +4,8 @@ import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
 import org.apache.kafka.streams.scala.StreamsBuilder
 import org.apache.kafka.streams.scala.Serdes.{Long, String}
 import org.apache.kafka.streams.scala.ImplicitConversions._
-import org.apache.kafka.common.serialization.Serdes._
-
 import java.util.{Locale, Properties}
 import java.util.concurrent.CountDownLatch
-import org.apache.kafka.streams.scala.kstream.Materialized
 
 object WordCount {
   def main(args: Array[String]) {

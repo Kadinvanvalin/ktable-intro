@@ -10,7 +10,7 @@ import java.util.Properties
 import java.util.concurrent.CountDownLatch
 
 object LineSplit {
-  def main() {
+  def main(args: Array[String]) {
     val props = new Properties();
     props.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-linesplit");
     props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
